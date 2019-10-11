@@ -1,41 +1,38 @@
-
-// The core modude of the CPU
-//   i_clk - clock register
-//   i_rst - reset register
 module proc(i_clk, i_rst);
+    /*
+     * i_clk - clock register
+     * i_rst - reset register
+     */
     input    i_clk, i_rst;
 
     /*
-         pc - program counter register
-         pc_inc -
-         pc_next - 
-         val_reg0 - value stored in the first register
-         val_reg1 - value stored in the second register
-         read_addr -
-         ram_addr - 
-         ram_out - 
-    */
-    wire [31:0] pc, pc_inc, pc_next, val_reg0, val_reg1, read_addr, ram_addr, ram_out;
+     * pc - program counter register
+     * pc_inc - pc + 2
+     * pc_next - next pc (either pc_inc or pc_jmp (should be added))
+     * val_reg0 - value stored in the first register (Ith also)
+     * val_reg1 - value stored in the second register (Jth also)
+     * ram_addr - address to read/write at ram
+     * ram_out - value at ram_addr in ram
+     */
+    wire [31:0] pc, pc_inc, pc_next, val_reg0, val_reg1, ram_addr, ram_out;
     // ir - instruction register
     wire [15:0] ir;
     // reg0, reg1 - indices of first and second registers
     wire [ 4:0] reg0, reg1;
     // inst - instruction index
     wire [ 3:0] inst;
-    // fmt - 
-    // ram_do - 
+    // fmt - format of instruction
+    // ram_do - action with ram, should be RAM_*
     wire [ 1:0] fmt, ram_do;
-    // do_jump - 
+    // do_jump - should we jump or not
     wire        do_jump;
  
-    // Instance of program counter module
     pc        pc_(.i_clk(i_clk),
                   .i_rst(i_rst),
                   .i_pc(pc_next),
                   .o_pc(pc));
     assign pc_inc = pc + 32'd2;
  
-    // Instance of rom module
     rom        rom(.i_addr(pc),
                    .o_data(ir));
  
@@ -45,10 +42,10 @@ module proc(i_clk, i_rst);
     assign reg1 = ir[ 4: 0];
  
     /* TODO: may be those 2 should be in ALU module */
-    // 
+    // what action to do in ram module
     assign ram_do = ((fmt == `OP_LD || fmt == `OP_LDA) ? `RAM_READ :
                       (fmt == `OP_ST) ? `RAM_WRITE : `RAM_NONE);
-    // 
+    // what address to use in ram module
     assign ram_addr = ((fmt == `OP_LD) ? val_reg0 :
                         (fmt == `OP_ST) ? val_reg1 : pc_inc);
 
@@ -81,12 +78,23 @@ module proc(i_clk, i_rst);
 
 endmodule
 
-// 
 module regf(i_clk, i_reg0, i_reg1, i_wb_reg, i_wb_val, o_reg0, o_reg1);
+   /*
+    * i_clk    - clock
+    * i_rst    - reset
+    * i_reg0   - index of first register to read
+    * i_reg1   - index of second register to read
+    * i_wb_reg - index of register to write back
+    * i_wb_val - value to write back
+    */
    input        i_clk, i_rst;
    input  [4:0] i_reg0, i_reg1, i_wb_reg;
    input [31:0] i_wb_val;
 
+   /*
+    * o_reg0 - value of first register to read
+    * o_reg1 - value of second register to read
+    */
    output [31:0] o_reg0, o_reg1;
 
    reg [31:0] 	 reg0, reg1;

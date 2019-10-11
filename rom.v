@@ -1,5 +1,3 @@
-
-
 module rom(i_addr, o_data);
    input  [31:0]  i_addr;
    output [15:0]  o_data;

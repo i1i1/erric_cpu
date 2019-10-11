@@ -1,5 +1,3 @@
-
-
 module pc(i_clk, i_rst, i_pc, o_pc);
    input         i_clk, i_rst;
    input  [31:0] i_pc;
@@ -17,3 +15,4 @@ module pc(i_clk, i_rst, i_pc, o_pc);
       end
    end
 endmodule
+
