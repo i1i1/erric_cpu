@@ -6,15 +6,16 @@ module proc(i_clk, i_rst);
     input    i_clk, i_rst;
 
     /*
-     * pc - program counter register
-     * pc_inc - pc + 2
-     * pc_next - next pc (either pc_inc or pc_jmp (should be added))
+     * pc       - program counter register
+     * pc_inc   - pc + 2
+     * pc_jmp   - program counter if jump will occur
+     * pc_next  - next pc (either pc_inc or pc_jmp)
      * val_reg0 - value stored in the first register (Ith also)
      * val_reg1 - value stored in the second register (Jth also)
      * ram_addr - address to read/write at ram
-     * ram_out - value at ram_addr in ram
+     * ram_out  - value at ram_addr in ram
      */
-    wire [31:0] pc, pc_inc, pc_next, val_reg0, val_reg1, ram_addr, ram_out;
+    wire [31:0] pc, pc_inc, pc_next, pc_jump, val_reg0, val_reg1, ram_addr, ram_out;
     // ir - instruction register
     wire [15:0] ir;
     // reg0, reg1 - indices of first and second registers
@@ -73,44 +74,8 @@ module proc(i_clk, i_rst);
                 .o_val(ram_out));
 
    assign do_jump = (fmt == `OP_CBR && val_reg0 != 32'd0);
-   assign pc_next = (do_jump ? pc_inc : val_reg1);
-
-
-endmodule
-
-module regf(i_clk, i_reg0, i_reg1, i_wb_reg, i_wb_val, o_reg0, o_reg1);
-   /*
-    * i_clk    - clock
-    * i_rst    - reset
-    * i_reg0   - index of first register to read
-    * i_reg1   - index of second register to read
-    * i_wb_reg - index of register to write back
-    * i_wb_val - value to write back
-    */
-   input        i_clk, i_rst;
-   input  [4:0] i_reg0, i_reg1, i_wb_reg;
-   input [31:0] i_wb_val;
-
-   /*
-    * o_reg0 - value of first register to read
-    * o_reg1 - value of second register to read
-    */
-   output [31:0] o_reg0, o_reg1;
-
-   reg [31:0] 	 reg0, reg1;
-
-   reg [31:0] 	 regfile[0:31];
-
-   assign o_reg0 = reg0;
-   assign o_reg1 = reg1;
-
-   always @ (posedge i_clk) begin
-      reg0 <= regfile[i_reg0];
-      reg1 <= regfile[i_reg1];
-
-      /* TODO: this won't work :( */
-      regfile[i_wb_reg] <= i_wb_val;
-   end
+   assign pc_jump = val_reg1;
+   assign pc_next = (do_jump ? pc_inc : pc_jump);
 
 endmodule
 
