@@ -1,7 +1,9 @@
 module testbench_main();
     reg clk;
+    reg rst;
 
-    cpu cpu(clk);
+    proc proc(.i_clk(clk),
+              .i_rst(rst));
 
 
     initial begin

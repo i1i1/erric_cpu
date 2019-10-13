@@ -24,4 +24,12 @@
  `define RAM_READ       2'b01
  `define RAM_WRITE      2'b10
 
+ `define FMT_1B         2'b00
+ `define FMT_2B         2'b01
+ `define FMT_4B         2'b11
+
+ `define CBR_MORE       31'b001
+ `define CBR_LESS       31'b010
+ `define CBR_EQ         31'b100
+
 `endif /* _DEFS_V_ */

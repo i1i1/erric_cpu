@@ -15,11 +15,11 @@ module proc(i_clk, i_rst);
      * ram_addr - address to read/write at ram
      * ram_out  - value at ram_addr in ram
      */
-    wire [31:0] pc, pc_inc, pc_next, pc_jump, val_reg0, val_reg1, ram_addr, ram_out;
+    wire [31:0] pc, pc_inc, pc_next, pc_jump, val_reg0, val_reg1, ram_addr, ram_out, wb_val_alu, wb_val;
     // ir - instruction register
     wire [15:0] ir;
     // reg0, reg1 - indices of first and second registers
-    wire [ 4:0] reg0, reg1;
+    wire [ 4:0] reg0, reg1, wb_reg;
     // inst - instruction index
     wire [ 3:0] inst;
     // fmt - format of instruction
@@ -48,25 +48,30 @@ module proc(i_clk, i_rst);
                       (fmt == `OP_ST) ? `RAM_WRITE : `RAM_NONE);
     // what address to use in ram module
     assign ram_addr = ((fmt == `OP_LD) ? val_reg0 :
-                        (fmt == `OP_ST) ? val_reg1 : pc_inc);
+                        (fmt == `OP_LDA) ? pc_inc :
+                         (fmt == `OP_ST) ? val_reg1 : pc_inc);
 
-`ifdef DEBUG
+    assign wb_reg = ((fmt == `OP_CBR) ? reg0 : reg1);
+    assign wb_val = ((fmt == `OP_CBR) ? pc_inc : wb_val_alu);
+
+
     regf        regf(.i_clk(i_clk),
                      .i_reg0(reg0),
                      .i_reg1(reg1),
-                     .i_wb_reg(...), /* idx of reg for write back */
-                     .i_wb_val(...),
+                     .i_wb_reg(wb_reg),
+                     .i_wb_val(wb_val_alu),
                      .o_reg0(val_reg0),
                      .o_reg1(val_reg1));
  
-    /* TODO: opcode decoding and handling */
-    alu alu(.i_clk(i_clk),
-        .i_fmt(fmt),
-        .i_inst(inst),
-        ...);
-`endif
+    alu     alu(.i_clk(i_clk),
+                .i_fmt(fmt),
+                .i_inst(inst),
+                .i_reg0(val_reg0),
+                .i_reg1(val_reg1),
+                .i_ram(ram_out),
+                .o_wb_val(wb_val));
 
-   /* TODO: maybe there should be no ROM, instead only one RAM module */
+   /* TODO: there should be no ROM, instead only one RAM module */
    ram      ram(.i_clk(i_clk),
                 .i_do(ram_do),
                 .i_addr(ram_addr),
