@@ -28,8 +28,20 @@
  `define FMT_2B         2'b01
  `define FMT_4B         2'b11
 
- `define CBR_MORE       31'b001
- `define CBR_LESS       31'b010
- `define CBR_EQ         31'b100
+ `define CND_MORE       31'b001
+ `define CND_LESS       31'b010
+ `define CND_EQ         31'b100
+
+`define ALU_MOV        4'h0
+`define ALU_LSR        4'h1
+`define ALU_LSL        4'h2
+`define ALU_ASR        4'h3
+`define ALU_ASL        4'h4
+`define ALU_ADD        4'h5
+`define ALU_SUB        4'h6
+`define ALU_OR         4'h7
+`define ALU_AND        4'h8
+`define ALU_XOR        4'h9
+`define ALU_CND        4'hA
 
 `endif /* _DEFS_V_ */

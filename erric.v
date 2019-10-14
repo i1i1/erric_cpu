@@ -44,15 +44,15 @@ module proc(i_clk, i_rst);
  
     /* TODO: may be those 2 should be in ALU module */
     // what action to do in ram module
-    assign ram_do = ((fmt == `OP_LD || fmt == `OP_LDA) ? `RAM_READ :
-                      (fmt == `OP_ST) ? `RAM_WRITE : `RAM_NONE);
+    assign ram_do = ((inst == `OP_LD || inst == `OP_LDA) ? `RAM_READ :
+                      (inst == `OP_ST) ? `RAM_WRITE : `RAM_NONE);
     // what address to use in ram module
-    assign ram_addr = ((fmt == `OP_LD) ? val_reg0 :
-                        (fmt == `OP_LDA) ? pc_inc :
-                         (fmt == `OP_ST) ? val_reg1 : pc_inc);
+    assign ram_addr = ((inst == `OP_LD) ? val_reg0 :
+                        (inst == `OP_LDA) ? pc_inc :
+                         (inst == `OP_ST) ? val_reg1 : pc_inc);
 
-    assign wb_reg = ((fmt == `OP_CBR) ? reg0 : reg1);
-    assign wb_val = ((fmt == `OP_CBR) ? pc_inc : wb_val_alu);
+    assign wb_reg = ((inst == `OP_CBR) ? reg0 : reg1);
+    assign wb_val = ((inst == `OP_CBR) ? pc_inc : wb_val_alu);
 
 
     regf        regf(.i_clk(i_clk),
@@ -62,14 +62,32 @@ module proc(i_clk, i_rst);
                      .i_wb_val(wb_val_alu),
                      .o_reg0(val_reg0),
                      .o_reg1(val_reg1));
+
+    control     control(.i_clk(i_clk),
+                        .i_fmt(i_fmt),
+                        .o_alu_do(alu_do));
+
+    alu #(8) alu8(.i_clk(i_clk),
+                  .i_do(alu_do),
+                  .i_reg0(reg0),
+                  .i_reg1(reg1),
+                  .o_out(alu8_out));
+
+    alu #(16) alu16(.i_clk(i_clk),
+                    .i_do(alu_do),
+                    .i_reg0(reg0),
+                    .i_reg1(reg1),
+                    .o_out(alu16_out));
  
-    alu     alu(.i_clk(i_clk),
-                .i_fmt(fmt),
-                .i_inst(inst),
-                .i_reg0(val_reg0),
-                .i_reg1(val_reg1),
-                .i_ram(ram_out),
-                .o_wb_val(wb_val));
+    alu #(32) alu32(.i_clk(i_clk),
+                    .i_do(alu_do),
+                    .i_reg0(reg0),
+                    .i_reg1(reg1),
+                    .o_out(alu32_out));
+
+   assign alu_out = ((fmt == `FMT_1B) ? { reg0[31:8], alu8_out } :
+                      (fmt == `FMT_2B) ? { reg0[31:16], alu16_out } :
+                       alu32_out);
 
    /* TODO: there should be no ROM, instead only one RAM module */
    ram      ram(.i_clk(i_clk),

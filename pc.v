@@ -14,5 +14,6 @@ module pc(i_clk, i_rst, i_pc, o_pc);
          pc <= i_pc;
       end
    end
+
 endmodule
 

@@ -1,164 +1,30 @@
 `include "defs.v"
 
-module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
-   input [31:0] i_reg0, i_reg1, i_ram;
-   input [ 3:0] i_inst;
-   input [ 1:0] i_fmt;
-   input i_clk;
+module alu(i_do, i_reg0, i_reg1, o_out);
+   parameter SIZE=8;
 
-   output reg [31:0] o_wb_val;
+   input [SIZE-1:0] i_reg0, i_reg1;
+   input [ 3:0] i_do;
 
-   wire [31:0]        diff;
+   output [SIZE-1:0] o_out;
 
-   assign diff = i_reg0 - i_reg1;
+   wire [SIZE-1:0] res[0:15];
 
+   assign o_out = res[i_do];
 
-   always @ (*) begin
-      case (i_inst)
-        `OP_SPEC:
-           /* TODO */;
-        `OP_LD:  o_wb_val = i_ram;
-        `OP_LDA: o_wb_val = i_ram;
-        `OP_ST:  o_wb_val = i_reg1; /* don't do anything */
-        `OP_MOV: begin
-           case (i_fmt)
-             `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31: 8];
-                o_wb_val[ 7: 0] = i_reg0[ 7: 0];
-             end
-             `FMT_2B: begin
-                o_wb_val[31:16] = i_reg1[31:16];
-                o_wb_val[15: 0] = i_reg0[15: 0];
-             end
-             `FMT_4B: o_wb_val = i_reg0;
-           endcase
-        end
-        `OP_ADD: begin
-           case (i_fmt)
-             `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31: 8];
-                o_wb_val[ 7: 0] = i_reg1[ 7: 0] + i_reg0[ 7: 0];
-             end
-             `FMT_2B: begin
-                o_wb_val[31:16] = i_reg1[31:16];
-                o_wb_val[15: 0] = i_reg1[15: 0] + i_reg0[15: 0];
-             end
-             `FMT_4B: o_wb_val = i_reg0 + i_reg1;
-           endcase
-        end
-        `OP_SUB: begin
-           case (i_fmt)
-             `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31: 8];
-                o_wb_val[ 7: 0] = i_reg1[ 7: 0] - i_reg0[ 7: 0];
-             end
-             `FMT_2B: begin
-                o_wb_val[31:16] = i_reg1[31:16];
-                o_wb_val[15: 0] = i_reg1[15: 0] - i_reg0[15: 0];
-             end
-             `FMT_4B: o_wb_val = i_reg0 - i_reg1;
-           endcase
-        end
-        `OP_ASR: begin
-           case (i_fmt)
-             `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31: 8];
-                o_wb_val[ 7: 0] = i_reg0[ 7: 0] >>> 1;
-             end
-             `FMT_2B: begin
-                o_wb_val[31:16] = i_reg1[31:16];
-                o_wb_val[15: 0] = i_reg0[15: 0] >>> 1;
-             end
-             `FMT_4B: o_wb_val = i_reg0[31: 0] >>> 1;
-           endcase
-        end
-        `OP_ASL: begin
-           case (i_fmt)
-             `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31: 8];
-                o_wb_val[ 7: 0] = i_reg0[ 7: 0] <<< 1;
-             end
-             `FMT_2B: begin
-                o_wb_val[31:16] = i_reg1[31:16];
-                o_wb_val[15: 0] = i_reg0[15: 0] <<< 1;
-             end
-             `FMT_4B: o_wb_val = i_reg0[31: 0] <<< 1;
-           endcase
-        end
-        `OP_OR: begin
-           case (i_fmt)
-             `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31: 8];
-                o_wb_val[ 7: 0] = i_reg0[ 7: 0] | i_reg1[ 7: 0];
-             end
-             `FMT_2B: begin
-                o_wb_val[31:16] = i_reg1[31:16];
-                o_wb_val[15: 0] = i_reg0[15: 0] | i_reg1[15: 0];
-             end
-             `FMT_4B: o_wb_val = i_reg0 | i_reg1;
-           endcase
-        end
-        `OP_AND: begin
-           case (i_fmt)
-             `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31: 8];
-                o_wb_val[ 7: 0] = i_reg0[ 7: 0] & i_reg1[ 7: 0];
-             end
-             `FMT_2B: begin
-                o_wb_val[31:16] = i_reg1[31:16];
-                o_wb_val[15: 0] = i_reg0[15: 0] & i_reg1[15: 0];
-             end
-             `FMT_4B: o_wb_val = i_reg0 & i_reg1;
-           endcase
-        end
-        `OP_XOR: begin
-           case (i_fmt)
-             `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31: 8];
-                o_wb_val[ 7: 0] = i_reg0[ 7: 0] ^ i_reg1[ 7: 0];
-             end
-             `FMT_2B: begin
-                o_wb_val[31:16] = i_reg1[31:16];
-                o_wb_val[15: 0] = i_reg0[15: 0] ^ i_reg1[15: 0];
-             end
-             `FMT_4B: o_wb_val = i_reg0 ^ i_reg1;
-           endcase
-        end
-        `OP_LSL: begin
-           case (i_fmt)
-             `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31: 8];
-                o_wb_val[ 7: 0] = i_reg0[ 7: 0] << 1;
-             end
-             `FMT_2B: begin
-                o_wb_val[31:16] = i_reg1[31:16];
-                o_wb_val[15: 0] = i_reg0[15: 0] << 1;
-             end
-             `FMT_4B: o_wb_val = i_reg0[31: 0] << 1;
-           endcase
-        end
-        `OP_LSR: begin
-           case (i_fmt)
-             `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31: 8];
-                o_wb_val[ 7: 0] = i_reg0[ 7: 0] >> 1;
-             end
-             `FMT_2B: begin
-                o_wb_val[31:16] = i_reg1[31:16];
-                o_wb_val[15: 0] = i_reg0[15: 0] >> 1;
-             end
-             `FMT_4B: o_wb_val = i_reg0[31: 0] >> 1;
-           endcase
-        end
-        `OP_CND: begin
-          if (diff == 0)
-            o_wb_val = `CBR_EQ;
-          else
-            o_wb_val = ((diff[31] == 0) ? `CBR_MORE : `CBR_LESS);
-        end
-        `OP_CBR: /* nothing here */;
-      endcase
-   end
+   assign res[`ALU_MOV] = i_reg0;
+   assign res[`ALU_LSR] = i_reg0 << 1;
+   assign res[`ALU_LSL] = i_reg0 >> 1;
+   assign res[`ALU_ASR] = i_reg0 <<< 1;
+   assign res[`ALU_ASL] = i_reg0 >>> 1;
+   assign res[`ALU_ADD] = i_reg0 + i_reg1;
+   assign res[`ALU_SUB] = i_reg0 - i_reg1;
+   assign res[`ALU_OR]  = i_reg0 | i_reg1;
+   assign res[`ALU_AND] = i_reg0 & i_reg1;
+   assign res[`ALU_XOR] = i_reg0 ^ i_reg1;
+   assign res[`ALU_CND] = ((res[`ALU_SUB] == 0) ? `CND_EQ :
+               ((res[`ALU_SUB][SIZE-1] == 0) ? `CND_MORE :
+                `CND_LESS));
 
 endmodule
 

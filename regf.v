@@ -17,9 +17,9 @@ module regf(i_clk, i_reg0, i_reg1, i_wb_reg, i_wb_val, o_reg0, o_reg1);
     */
    output [31:0] o_reg0, o_reg1;
 
-   reg [31:0] 	 reg0, reg1;
+   reg [31:0]    reg0, reg1;
 
-   reg [31:0] 	 regfile[0:31];
+   reg [31:0]    regfile[0:31];
 
    assign o_reg0 = reg0;
    assign o_reg1 = reg1;
