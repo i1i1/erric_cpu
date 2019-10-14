@@ -25,6 +25,7 @@ module alu(i_do, i_reg0, i_reg1, o_out);
    assign res[`ALU_CND] = ((res[`ALU_SUB] == 0) ? `CND_EQ :
                ((res[`ALU_SUB][SIZE-1] == 0) ? `CND_MORE :
                 `CND_LESS));
+   assign res[`ALU_NOP] = i_reg1;
 
 endmodule
 
