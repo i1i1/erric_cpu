@@ -23,7 +23,7 @@ module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
         `OP_MOV: begin
            case (i_fmt)
              `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31:16];
+                o_wb_val[31: 8] = i_reg1[31: 8];
                 o_wb_val[ 7: 0] = i_reg0[ 7: 0];
              end
              `FMT_2B: begin
@@ -36,7 +36,7 @@ module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
         `OP_ADD: begin
            case (i_fmt)
              `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31:16];
+                o_wb_val[31: 8] = i_reg1[31: 8];
                 o_wb_val[ 7: 0] = i_reg1[ 7: 0] + i_reg0[ 7: 0];
              end
              `FMT_2B: begin
@@ -49,7 +49,7 @@ module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
         `OP_SUB: begin
            case (i_fmt)
              `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31:16];
+                o_wb_val[31: 8] = i_reg1[31: 8];
                 o_wb_val[ 7: 0] = i_reg1[ 7: 0] - i_reg0[ 7: 0];
              end
              `FMT_2B: begin
@@ -62,7 +62,7 @@ module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
         `OP_ASR: begin
            case (i_fmt)
              `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31:16];
+                o_wb_val[31: 8] = i_reg1[31: 8];
                 o_wb_val[ 7: 0] = i_reg0[ 7: 0] >>> 1;
              end
              `FMT_2B: begin
@@ -75,7 +75,7 @@ module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
         `OP_ASL: begin
            case (i_fmt)
              `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31:16];
+                o_wb_val[31: 8] = i_reg1[31: 8];
                 o_wb_val[ 7: 0] = i_reg0[ 7: 0] <<< 1;
              end
              `FMT_2B: begin
@@ -88,7 +88,7 @@ module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
         `OP_OR: begin
            case (i_fmt)
              `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31:16];
+                o_wb_val[31: 8] = i_reg1[31: 8];
                 o_wb_val[ 7: 0] = i_reg0[ 7: 0] | i_reg1[ 7: 0];
              end
              `FMT_2B: begin
@@ -101,7 +101,7 @@ module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
         `OP_AND: begin
            case (i_fmt)
              `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31:16];
+                o_wb_val[31: 8] = i_reg1[31: 8];
                 o_wb_val[ 7: 0] = i_reg0[ 7: 0] & i_reg1[ 7: 0];
              end
              `FMT_2B: begin
@@ -114,7 +114,7 @@ module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
         `OP_XOR: begin
            case (i_fmt)
              `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31:16];
+                o_wb_val[31: 8] = i_reg1[31: 8];
                 o_wb_val[ 7: 0] = i_reg0[ 7: 0] ^ i_reg1[ 7: 0];
              end
              `FMT_2B: begin
@@ -127,7 +127,7 @@ module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
         `OP_LSL: begin
            case (i_fmt)
              `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31:16];
+                o_wb_val[31: 8] = i_reg1[31: 8];
                 o_wb_val[ 7: 0] = i_reg0[ 7: 0] << 1;
              end
              `FMT_2B: begin
@@ -140,7 +140,7 @@ module alu(i_clk, i_fmt, i_inst, i_reg0, i_reg1, i_ram, o_wb_val);
         `OP_LSR: begin
            case (i_fmt)
              `FMT_1B: begin
-                o_wb_val[31: 8] = i_reg1[31:16];
+                o_wb_val[31: 8] = i_reg1[31: 8];
                 o_wb_val[ 7: 0] = i_reg0[ 7: 0] >> 1;
              end
              `FMT_2B: begin
