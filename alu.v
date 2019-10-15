@@ -20,7 +20,7 @@ module alu_total(i_reg0, i_reg1, i_alu_do, i_fmt, o_alu_out);
                     .i_reg0(i_reg0[15:0]),
                     .i_reg1(i_reg1[15:0]),
                     .o_out(alu16_out));
- 
+
     alu #(32) alu32(.i_do(i_alu_do),
                     .i_reg0(i_reg0),
                     .i_reg1(i_reg1),

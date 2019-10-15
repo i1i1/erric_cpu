@@ -1,69 +1,51 @@
 module proc(i_clk, i_rst);
-    /*
-     * i_clk - clock register
-     * i_rst - reset register
-     */
     input    i_clk, i_rst;
 
-    /*
-     * pc       - program counter register
-     * pc_inc   - pc + 2
-     * pc_jmp   - program counter if jump will occur
-     * pc_next  - next pc (either pc_inc or pc_jmp)
-     * val_reg0 - value stored in the first register (Ith also)
-     * val_reg1 - value stored in the second register (Jth also)
-     * ram_addr - address to read/write at ram
-     * ram_out  - value at ram_addr in ram
-     */
     wire [31:0] pc, pc_inc, pc_next, pc_jump, val_reg0, val_reg1, ram_addr, ram_out, wb_val_alu, wb_val, alu_out;
-    // ir - instruction register
     wire [15:0] ir;
-    // reg0, reg1 - indices of first and second registers
     wire [ 4:0] reg0, reg1, wb_reg;
-    // inst - instruction index
     wire [ 3:0] inst, alu_do;
-    // fmt - format of instruction
-    // ram_do - action with ram, should be RAM_*
     wire [ 1:0] fmt, ram_do;
-    // do_jump - should we jump or not
     wire        do_jump;
  
     pc        pc_(.i_clk(i_clk),
                   .i_rst(i_rst),
                   .i_pc(pc_next),
-                  .o_pc(pc));
-    assign pc_inc = pc + 32'd2;
+                  .o_pc(pc),
+		  .o_pc_inc(pc_inc));
  
     /* TODO: there should be no ROM, instead only one RAM module */
     rom        rom(.i_addr(pc),
                    .o_data(ir));
- 
+
     assign fmt  = ir[15:14];
     assign inst = ir[13:10];
     assign reg0 = ir[ 9: 5];
     assign reg1 = ir[ 4: 0];
  
-    assign wb_reg = ((inst == `OP_CBR) ? reg0 : reg1);
-    assign wb_val = ((inst == `OP_CBR) ? pc_inc : wb_val_alu);
-
 
     regf        regf(.i_clk(i_clk),
                      .i_reg0(reg0),
                      .i_reg1(reg1),
                      .i_wb_reg(wb_reg),
-                     .i_wb_val(wb_val_alu),
+                     .i_wb_val(wb_val),
                      .o_reg0(val_reg0),
                      .o_reg1(val_reg1));
 
     control     control(.i_clk(i_clk),
                         .i_inst(inst),
-                        .i_reg0(val_reg0),
-                        .i_reg1(val_reg1),
+                        .i_reg0(reg0),
+                        .i_reg1(reg1),
+                        .i_val_reg0(val_reg0),
+                        .i_val_reg1(val_reg1),
                         .i_pc_inc(pc_inc),
+                        .i_alu_out(alu_out),
                         .o_ram_do(ram_do),
                         .o_ram_addr(ram_addr),
                         .o_do_jump(do_jump),
-                        .o_alu_do(alu_do));
+                        .o_alu_do(alu_do),
+			.o_wb_reg(wb_reg),
+			.o_wb_val(wb_val));
 
     alu_total   alu(.i_reg0(val_reg0),
                     .i_reg1(val_reg1),
