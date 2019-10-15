@@ -1,5 +1,37 @@
 `include "defs.v"
 
+module alu_total(i_reg0, i_reg1, i_alu_do, i_fmt, o_alu_out);
+    input [31:0] i_reg0, i_reg1;
+    input [ 3:0] i_alu_do;
+    input [ 1:0] i_fmt;
+
+    output [31:0] o_alu_out;
+
+    wire [31:0] alu32_out;
+    wire [15:0] alu16_out;
+    wire [ 7:0] alu8_out;
+
+    alu #(8) alu8(.i_do(i_alu_do),
+                  .i_reg0(i_reg0[7:0]),
+                  .i_reg1(i_reg1[7:0]),
+                  .o_out(alu8_out));
+
+    alu #(16) alu16(.i_do(i_alu_do),
+                    .i_reg0(i_reg0[15:0]),
+                    .i_reg1(i_reg1[15:0]),
+                    .o_out(alu16_out));
+ 
+    alu #(32) alu32(.i_do(i_alu_do),
+                    .i_reg0(i_reg0),
+                    .i_reg1(i_reg1),
+                    .o_out(alu32_out));
+
+   assign o_alu_out = ((i_fmt == `FMT_1B) ? { i_reg0[31:8], alu8_out } :
+                        (i_fmt == `FMT_2B) ? { i_reg0[31:16], alu16_out } :
+                         alu32_out);
+
+endmodule
+
 module alu(i_do, i_reg0, i_reg1, o_out);
    parameter SIZE=8;
 

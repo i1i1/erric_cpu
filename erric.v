@@ -15,10 +15,9 @@ module proc(i_clk, i_rst);
      * ram_addr - address to read/write at ram
      * ram_out  - value at ram_addr in ram
      */
-    wire [31:0] pc, pc_inc, pc_next, pc_jump, val_reg0, val_reg1, ram_addr, ram_out, wb_val_alu, wb_val, alu32_out;
+    wire [31:0] pc, pc_inc, pc_next, pc_jump, val_reg0, val_reg1, ram_addr, ram_out, wb_val_alu, wb_val, alu_out;
     // ir - instruction register
-    wire [15:0] ir, alu16_out;
-    wire [ 7:0] alu8_out;
+    wire [15:0] ir;
     // reg0, reg1 - indices of first and second registers
     wire [ 4:0] reg0, reg1, wb_reg;
     // inst - instruction index
@@ -35,7 +34,7 @@ module proc(i_clk, i_rst);
                   .o_pc(pc));
     assign pc_inc = pc + 32'd2;
  
-   /* TODO: there should be no ROM, instead only one RAM module */
+    /* TODO: there should be no ROM, instead only one RAM module */
     rom        rom(.i_addr(pc),
                    .o_data(ir));
  
@@ -44,15 +43,6 @@ module proc(i_clk, i_rst);
     assign reg0 = ir[ 9: 5];
     assign reg1 = ir[ 4: 0];
  
-    /* TODO: may be those 2 should be in ALU module */
-    // what action to do in ram module
-    assign ram_do = ((inst == `OP_LD || inst == `OP_LDA) ? `RAM_READ :
-                      (inst == `OP_ST) ? `RAM_WRITE : `RAM_NONE);
-    // what address to use in ram module
-    assign ram_addr = ((inst == `OP_LD) ? val_reg0 :
-                        (inst == `OP_LDA) ? pc_inc :
-                         (inst == `OP_ST) ? val_reg1 : pc_inc);
-
     assign wb_reg = ((inst == `OP_CBR) ? reg0 : reg1);
     assign wb_val = ((inst == `OP_CBR) ? pc_inc : wb_val_alu);
 
@@ -67,34 +57,26 @@ module proc(i_clk, i_rst);
 
     control     control(.i_clk(i_clk),
                         .i_inst(inst),
+                        .i_reg0(val_reg0),
+                        .i_reg1(val_reg1),
+                        .i_pc_inc(pc_inc),
+                        .o_ram_do(ram_do),
+                        .o_ram_addr(ram_addr),
+                        .o_do_jump(do_jump),
                         .o_alu_do(alu_do));
 
-    alu #(8) alu8(.i_do(alu_do),
-                  .i_reg0(val_reg0[7:0]),
-                  .i_reg1(val_reg1[7:0]),
-                  .o_out(alu8_out));
-
-    alu #(16) alu16(.i_do(alu_do),
-                    .i_reg0(val_reg0[15:0]),
-                    .i_reg1(val_reg1[15:0]),
-                    .o_out(alu16_out));
- 
-    alu #(32) alu32(.i_do(alu_do),
-                    .i_reg0(val_reg0),
+    alu_total   alu(.i_reg0(val_reg0),
                     .i_reg1(val_reg1),
-                    .o_out(alu32_out));
+                    .i_alu_do(alu_do),
+                    .i_fmt(fmt),
+                    .o_alu_out(alu_out));
 
-   assign alu_out = ((fmt == `FMT_1B) ? { reg0[31:8], alu8_out } :
-                      (fmt == `FMT_2B) ? { reg0[31:16], alu16_out } :
-                       alu32_out);
+    ram      ram(.i_clk(i_clk),
+                 .i_do(ram_do),
+                 .i_addr(ram_addr),
+                 .i_val(val_reg0),
+                 .o_val(ram_out));
 
-   ram      ram(.i_clk(i_clk),
-                .i_do(ram_do),
-                .i_addr(ram_addr),
-                .i_val(val_reg0),
-                .o_val(ram_out));
-
-   assign do_jump = (fmt == `OP_CBR && val_reg0 != 32'd0);
    assign pc_jump = val_reg1;
    assign pc_next = (do_jump ? pc_inc : pc_jump);
 

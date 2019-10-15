@@ -18,7 +18,7 @@ module ram(i_clk, i_do, i_addr, i_val, o_val);
 //   initial
 //     $readmemh("v.out", mem);
 
-    assign o_data = { mem[i_addr],   mem[i_addr+1],
+    assign o_val = { mem[i_addr],   mem[i_addr+1],
                       mem[i_addr+2], mem[i_addr+3] };
  
     always @ (posedge i_clk) begin
