@@ -1,28 +1,29 @@
 module proc(i_clk, i_rst);
     input    i_clk, i_rst;
 
-    wire [31:0] pc, pc_inc, pc_next, pc_jump, val_reg0, val_reg1, ram_addr, ram_out, wb_val_alu, wb_val, alu_out;
+    wire [31:0] pc, pc_inc, pc_next, pc_jump, val_reg0, val_reg1,
+                         ram_addr, ram_out, wb_val_alu, wb_val, alu_out;
     wire [15:0] ir;
     wire [ 4:0] reg0, reg1, wb_reg;
-    wire [ 3:0] inst, alu_do;
-    wire [ 1:0] fmt, ram_do;
+    wire [ 3:0] inst, alu_action;
+    wire [ 1:0] fmt, ram_action;
     wire        do_jump;
  
     pc        pc_(.i_clk(i_clk),
                   .i_rst(i_rst),
                   .i_pc(pc_next),
                   .o_pc(pc),
-		  .o_pc_inc(pc_inc));
+                  .o_pc_inc(pc_inc));
  
     /* TODO: there should be no ROM, instead only one RAM module */
     rom        rom(.i_addr(pc),
                    .o_data(ir));
 
-    assign fmt  = ir[15:14];
-    assign inst = ir[13:10];
-    assign reg0 = ir[ 9: 5];
-    assign reg1 = ir[ 4: 0];
- 
+    dispatcher dispatcher(.i_ir(ir),
+                          .o_fmt(fmt),
+                          .o_inst(inst),
+                          .o_reg0(reg0),
+                          .o_reg1(reg1));
 
     regf        regf(.i_clk(i_clk),
                      .i_reg0(reg0),
@@ -40,21 +41,21 @@ module proc(i_clk, i_rst);
                         .i_val_reg1(val_reg1),
                         .i_pc_inc(pc_inc),
                         .i_alu_out(alu_out),
-                        .o_ram_do(ram_do),
+                        .o_ram_action(ram_action),
                         .o_ram_addr(ram_addr),
                         .o_do_jump(do_jump),
-                        .o_alu_do(alu_do),
-			.o_wb_reg(wb_reg),
-			.o_wb_val(wb_val));
+                        .o_alu_action(alu_action),
+                        .o_wb_reg(wb_reg),
+                        .o_wb_val(wb_val));
 
     alu_total   alu(.i_reg0(val_reg0),
                     .i_reg1(val_reg1),
-                    .i_alu_do(alu_do),
+                    .i_alu_action(alu_action),
                     .i_fmt(fmt),
                     .o_alu_out(alu_out));
 
     ram      ram(.i_clk(i_clk),
-                 .i_do(ram_do),
+                 .i_action(ram_action),
                  .i_addr(ram_addr),
                  .i_val(val_reg0),
                  .o_val(ram_out));
