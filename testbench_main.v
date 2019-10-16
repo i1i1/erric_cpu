@@ -2,17 +2,22 @@ module testbench_main();
     reg clk;
     reg rst;
 
-    proc proc(.i_clk(clk),
-              .i_rst(rst));
+    wire run;
 
+    proc proc(.i_clk(clk),
+              .i_rst(rst),
+              .o_run(run));
+
+    parameter period = 100;
 
     initial begin
         $display("Initializing...");
-        clk = 0;
+        rst = 0;
+        rst = 1;
+        #70 clk = 0;
+        while (run)
+           #(period/2) clk = ~clk;
     end
-
-    always
-        #10 clk = ~clk;
 
 endmodule
 

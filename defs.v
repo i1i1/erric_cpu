@@ -45,5 +45,10 @@
  `define ALU_XOR         4'hA
  `define ALU_CND         4'hB
 
+ `define WB_NONE         2'd0
+ `define WB_ALU          2'd1
+ `define WB_RAM          2'd2
+ `define WB_PC           2'd3
+
 `endif /* _DEFS_V_ */
 
