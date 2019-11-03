@@ -15,8 +15,10 @@ module testbench_main();
         rst = 0;
         rst = 1;
         #70 clk = 0;
-        while (run)
+        while (run) begin
+            $display("updating");
            #(period/2) clk = ~clk;
+        end
     end
 
 endmodule

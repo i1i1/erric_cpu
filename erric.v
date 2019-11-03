@@ -20,7 +20,7 @@ module proc(i_clk, i_rst, o_run);
                   .o_run(run));
 
     assign pc_inc = pc + 32'd2;
- 
+
     /* TODO: there should be no ROM, instead only one RAM module */
     rom        rom(.i_addr(pc),
                    .o_data(ir));
@@ -32,6 +32,7 @@ module proc(i_clk, i_rst, o_run);
                           .o_reg1(reg1));
 
     regf        regf(.i_clk(i_clk),
+                     .i_rst(i_rst),
                      .i_reg0(reg0),
                      .i_reg1(reg1),
                      .i_wb_reg(wb_reg),

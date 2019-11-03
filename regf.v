@@ -1,4 +1,4 @@
-module regf(i_clk, i_reg0, i_reg1, i_wb_reg, i_wb_val, o_reg0, o_reg1);
+module regf(i_clk, i_rst, i_reg0, i_reg1, i_wb_reg, i_wb_val, o_reg0, o_reg1);
    /*
     * i_clk    - clock
     * i_rst    - reset
