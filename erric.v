@@ -1,9 +1,22 @@
 module proc(i_clk, i_rst, o_run);
-    input    i_clk, i_rst;
-    output    o_run;
+    input       i_clk, i_rst;
+    output      o_run;
 
-    wire [31:0] pc, pc_inc, pc_next, pc_jump, val_reg0, val_reg1,
-                         ram_addr, ram_out, wb_val_alu, wb_val, alu_out;
+    wire [31:0] pc,
+                pc_inc,
+                pc_next,
+                pc_jump,
+
+                // Internal "registers" (actually, just wires) to link parts
+                // of CPU together.
+                val_reg0,
+                val_reg1,
+
+                ram_in,
+                ram_addr,
+                ram_out,
+                wb_val_alu,
+                wb_val;
     wire [15:0] ir;
     wire [ 4:0] reg0, reg1, wb_reg;
     wire [ 3:0] inst, alu_action;
@@ -51,10 +64,12 @@ module proc(i_clk, i_rst, o_run);
                         .i_pc_inc(pc_inc),
                         .o_wb_type(wb_type),
                         .o_run(run_next),
+                        .o_ram_in(ram_in),
                         .o_ram_action(ram_action),
                         .o_ram_addr(ram_addr),
                         .o_do_jump(do_jump),
                         .o_pc_jump(pc_jump),
+                        .i_alu_out(wb_val_alu),
                         .o_alu_action(alu_action),
                         .o_wb_reg(wb_reg),
                         .o_wb_val(wb_val));
@@ -63,12 +78,12 @@ module proc(i_clk, i_rst, o_run);
                     .i_reg1(val_reg1),
                     .i_alu_action(alu_action),
                     .i_fmt(fmt),
-                    .o_alu_out(alu_out));
+                    .o_alu_out(wb_val_alu));
 
     ram      ram(.i_clk(i_clk),
                  .i_action(ram_action),
                  .i_addr(ram_addr),
-                 .i_val(val_reg0),
+                 .i_val(ram_in),
                  .o_val(ram_out));
 
    assign pc_next = (do_jump ? pc_jump : pc_inc);

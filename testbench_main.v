@@ -16,7 +16,6 @@ module testbench_main();
         rst = 1;
         #70 clk = 0;
         while (run) begin
-            $display("updating");
            #(period/2) clk = ~clk;
         end
     end
