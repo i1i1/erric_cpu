@@ -1,3 +1,5 @@
+`include "erric.v"
+
 module testbench_main();
     reg clk;
     reg rst;
@@ -5,10 +7,10 @@ module testbench_main();
     wire run;
 
     proc proc(.i_clk(clk),
-              .i_rst(rst),
-              .o_run(run));
+        .i_rst(rst),
+        .o_run(run));
 
-    parameter period = 100;
+    parameter period=100;
 
     initial begin
         $display("Initializing...");
@@ -16,7 +18,7 @@ module testbench_main();
         rst = 1;
         #70 clk = 0;
         while (run) begin
-           #(period/2) clk = ~clk;
+            #(period/2) clk = ~clk;
         end
     end
 

@@ -1,3 +1,13 @@
+`include "alu.v"
+`include "control.v"
+`include "defs.v"
+`include "dispatcher.v"
+`include "pc.v"
+`include "ram.v"
+`include "regf.v"
+`include "rom.v"
+
+
 module proc(i_clk, i_rst, o_run);
     input    i_clk, i_rst;
     output    o_run;
@@ -11,7 +21,7 @@ module proc(i_clk, i_rst, o_run);
     wire        do_jump, run, run_next;
 
     assign o_run = run;
- 
+
     pc        pc_(.i_clk(i_clk),
                   .i_rst(i_rst),
                   .i_run(run_next),
@@ -20,7 +30,7 @@ module proc(i_clk, i_rst, o_run);
                   .o_run(run));
 
     assign pc_inc = pc + 32'd2;
- 
+
     /* TODO: there should be no ROM, instead only one RAM module */
     rom        rom(.i_addr(pc),
                    .o_data(ir));

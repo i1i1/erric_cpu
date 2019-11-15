@@ -5,7 +5,7 @@ module alu_total(i_reg0, i_reg1, i_alu_action, i_fmt, o_alu_out);
     input [ 3:0] i_alu_action;
     input [ 1:0] i_fmt;
 
-    output [31:0] o_alu_out;
+    output reg [31:0] o_alu_out;
 
     wire [31:0] alu32_out;
     wire [15:0] alu16_out;
@@ -26,9 +26,20 @@ module alu_total(i_reg0, i_reg1, i_alu_action, i_fmt, o_alu_out);
                     .i_reg1(i_reg1),
                     .o_out(alu32_out));
 
-   assign o_alu_out = ((i_fmt == `FMT_1B) ? { i_reg0[31:8], alu8_out } :
-                        (i_fmt == `FMT_2B) ? { i_reg0[31:16], alu16_out } :
-                         alu32_out);
+    always @(*) begin
+//        $display("Updating ALU %04x: %08x %08x -> %08x", i_alu_action, i_reg0, i_reg1, o_alu_out);
+        case (i_fmt)
+            `FMT_1B: o_alu_out = { i_reg0[31:8], alu8_out };
+            `FMT_2B: o_alu_out = { i_reg0[31:16], alu16_out };
+            `FMT_4B: o_alu_out = alu32_out;
+        endcase
+//        $display("Updated ALU %04x: %08x %08x -> %08x", i_alu_action, i_reg0, i_reg1, o_alu_out);
+    end
+
+
+//assign o_alu_out = ((i_fmt == `FMT_1B) ? { i_reg0[31:8], alu8_out } :
+//                        (i_fmt == `FMT_2B) ? { i_reg0[31:16], alu16_out } :
+//                         alu32_out);
 
 endmodule
 

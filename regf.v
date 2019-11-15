@@ -1,10 +1,10 @@
-module regf(i_clk, i_reg0, i_reg1, i_wb_reg, i_wb_val, o_reg0, o_reg1);
+module regf(i_clk, i_rst, i_reg0, i_reg1, i_wb_reg, i_wb_val, o_reg0, o_reg1);
    /*
     * i_clk    - clock
     * i_rst    - reset
     * i_reg0   - index of first register to read
     * i_reg1   - index of second register to read
-    * i_wb_reg - index of register to write back
+    * i_wb_reg - index of register to write back to
     * i_wb_val - value to write back
     */
    input        i_clk, i_rst;
@@ -23,9 +23,8 @@ module regf(i_clk, i_reg0, i_reg1, i_wb_reg, i_wb_val, o_reg0, o_reg1);
    assign o_reg1 = regfile[i_reg1];
 
    always @ (posedge i_clk) begin
-      regfile[i_wb_reg] <= i_wb_val;
-      $display("Writing to reg[0x%02x] = %04x", i_wb_reg, i_wb_val);
-      $display("");
+       regfile[i_wb_reg] <= i_wb_val;
+       $display("Writing to reg[0x%02x] = %04x", i_wb_reg, i_wb_val);
    end
 
    always @ (posedge i_rst) begin
