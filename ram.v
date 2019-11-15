@@ -15,8 +15,8 @@ module ram(i_clk, i_action, i_addr, i_val, o_val);
  
     reg     [7:0]  mem[0:`MEM_SIZE - 1];
 
-   initial
-     $readmemh("v.out", mem);
+    initial
+        $readmemh("v.out", mem);
 
     assign o_val = { mem[i_addr],   mem[i_addr+1],
                       mem[i_addr+2], mem[i_addr+3] };
