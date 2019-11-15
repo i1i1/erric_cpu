@@ -1,10 +1,11 @@
 module control(i_reg0, i_reg1, i_val_reg0, i_val_reg1, i_pc_inc, i_inst, i_clk, i_run, i_ir,
-	       o_ram_addr, o_wb_reg, o_wb_val, o_alu_action, o_ram_action, o_do_jump, o_run, o_pc_jump, o_wb_type);
+	       o_ram_addr, o_wb_reg, o_wb_val, o_alu_action, o_ram_action, o_do_jump, o_run, o_pc_jump, o_wb_type, i_fmt);
 
    input [31:0] i_val_reg0, i_val_reg1, i_pc_inc;
    input [15:0] i_ir;
    input [ 4:0] i_reg0, i_reg1;
    input [ 3:0] i_inst;
+   input [ 1:0] i_fmt;
    input        i_clk, i_run;
 
    output [31:0] o_ram_addr, o_wb_val, o_pc_jump;
@@ -59,6 +60,10 @@ module control(i_reg0, i_reg1, i_val_reg0, i_val_reg1, i_pc_inc, i_inst, i_clk, 
                i_inst, i_ir, i_reg0, i_reg1,
                (o_do_jump ? o_pc_jump : i_pc_inc),
                o_alu_action, actions[i_inst]);
+
+      if (i_inst == 0 && i_fmt == 1) begin
+         $display("trace: %04x", i_val_reg0);
+      end
    end
 
 endmodule

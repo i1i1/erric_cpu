@@ -66,7 +66,8 @@ module proc(i_clk, i_rst, o_run);
                         .o_pc_jump(pc_jump),
                         .o_alu_action(alu_action),
                         .o_wb_reg(wb_reg),
-                        .o_wb_val(wb_val));
+                        .o_wb_val(wb_val),
+                        .i_fmt(fmt));
 
     alu_total   alu(.i_reg0(val_reg0),
                     .i_reg1(val_reg1),
